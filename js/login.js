@@ -3,7 +3,7 @@
 // ============================================
 
 // CONFIGURACIÓN - CAMBIA ESTA URL POR LA DE TU BACKEND
-const BACKEND_URL = 'http://tuservidor.com/backend/api';
+const BACKEND_URL = 'http://tarjetadereporte.infinityfree.net/backend/api';
 
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('login-form');
