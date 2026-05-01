@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1e3c72">
+    <title>Notificar - Sistema Escolar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f4f8; min-height: 100vh; padding-bottom: 30px; }
+        
+        .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 16px 20px; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.12); }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .back-btn { background: rgba(255,255,255,0.15); border: none; width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; text-decoration: none; cursor: pointer; }
+        .header-title { color: white; font-size: 1.4em; font-weight: 600; }
+        
+        .main-content { padding: 20px 16px; max-width: 650px; margin: 0 auto; }
+        .form-section { background: white; border-radius: 22px; padding: 22px 18px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
+        .section-title { color: #1e3c72; font-size: 1.25em; font-weight: 700; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 2px solid #e8edf2; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: #667eea; font-size: 1.1em; }
+        
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; color: #2a5298; font-size: 0.9em; font-weight: 600; margin-bottom: 6px; }
+        .form-control { width: 100%; padding: 14px 16px; font-size: 1em; border: 2px solid #e0e0e0; border-radius: 14px; background: white; font-family: 'Poppins', sans-serif; }
+        .form-control:focus { outline: none; border-color: #2a5298; }
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+        
+        .destinatarios-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; min-height: 60px; padding: 12px; background: #f8fafc; border-radius: 16px; border: 1px dashed #cbd5e0; }
+        .destinatario-tag { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 16px; border-radius: 30px; display: inline-flex; align-items: center; gap: 10px; font-size: 0.9em; }
+        .destinatario-tag i { cursor: pointer; opacity: 0.8; font-size: 1.1em; }
+        .empty-destinatarios { width: 100%; text-align: center; color: #888; padding: 12px; font-size: 0.95em; }
+        .mensaje-exito { width: 100%; background: #10b981; color: white; padding: 12px 16px; border-radius: 14px; text-align: center; font-size: 0.95em; margin-top: 10px; }
+        
+        .search-box { margin-bottom: 18px; position: relative; }
+        .search-input-wrapper { position: relative; }
+        .search-input-wrapper i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #999; font-size: 1.1em; z-index: 1; pointer-events: none; }
+        .search-input-wrapper input { width: 100%; padding: 15px 16px 15px 48px !important; font-size: 1em; border: 2px solid #e0e0e0; border-radius: 14px; background: white; font-family: 'Poppins', sans-serif; box-sizing: border-box; }
+        .search-results { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 14px; margin-top: 8px; max-height: 280px; overflow-y: auto; box-shadow: 0 6px 18px rgba(0,0,0,0.15); display: none; border: 1px solid #e8edf2; z-index: 9999 !important; }
+        .search-results.show { display: block !important; }
+        .search-result-item { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e8edf2; cursor: pointer; }
+        .search-result-item:active { background: #f0f4ff; }
+        .search-result-info { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+        .search-result-name { font-weight: 600; color: #1e293b; font-size: 1em; }
+        .search-result-details { font-size: 0.85em; color: #64748b; }
+        .search-empty { padding: 20px; text-align: center; color: #888; font-size: 0.95em; }
+        
+        .btn-qr-scanner { width: 100%; padding: 15px; background: #f0f4f8; color: #1e3c72; border: 2px dashed #1e3c72; border-radius: 14px; font-size: 1.05em; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+        
+        .actividades-list { margin-bottom: 18px; min-height: 60px; }
+        .actividad-tag { padding: 12px 14px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .actividad-tag > div:first-child { flex: 1; min-width: 150px; }
+        .actividad-tag-nombre { font-weight: 600; color: #1e293b; margin-bottom: 3px; }
+        .actividad-tag-categoria { font-size: 0.8em; color: #64748b; background: rgba(0,0,0,0.04); padding: 2px 8px; border-radius: 12px; display: inline-block; }
+        .actividad-tag-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .actividad-tag-actions i { cursor: pointer; color: #ef4444; font-size: 1.1em; }
+        .actividad-tag-valores { display: flex; flex-direction: column; gap: 2px; font-size: 0.8em; }
+        .empty-actividades { color: #888; text-align: center; padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e0; font-size: 0.95em; }
+        
+        .actividad-buscador-container { margin-bottom: 18px; }
+        .actividad-search-results { max-height: 320px; overflow-y: auto; margin-top: 8px; border-radius: 14px; background: white; box-shadow: 0 6px 18px rgba(0,0,0,0.1); border: 1px solid #e8edf2; display: none; }
+        .actividad-search-item { padding: 14px 16px; border-bottom: 1px solid #e8edf2; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .actividad-search-info { flex: 1; }
+        .actividad-search-nombre { font-weight: 600; color: #1e293b; margin-bottom: 4px; }
+        .actividad-search-categoria { font-size: 0.8em; color: #64748b; background: #e2e8f0; padding: 3px 10px; border-radius: 12px; display: inline-block; }
+        .actividad-search-valor { padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.95em; white-space: nowrap; }
+        
+        .tipo-selector { display: flex; gap: 12px; margin-bottom: 18px; }
+        .tipo-btn { flex: 1; padding: 14px; border: 2px solid #e0e0e0; border-radius: 14px; background: white; font-size: 1em; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+        .tipo-btn[data-tipo="merito"].active { background: #10b981; border-color: #10b981; color: white; }
+        .tipo-btn[data-tipo="demerito"].active { background: #ef4444; border-color: #ef4444; color: white; }
+        
+        .btn-add-actividad { width: 100%; padding: 15px; background: #1e3c72; color: white; border: none; border-radius: 14px; font-size: 1.05em; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-top: 8px; }
+        
+        #sliderContainer10mo, #sliderContainer11_12 { display: none; padding: 16px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 14px; margin-bottom: 18px; }
+        #sliderContainer10mo label, #sliderContainer11_12 label { display: block; font-weight: 700; color: #856404; margin-bottom: 8px; font-size: 0.95em; }
+        .rango-info { display: flex; justify-content: space-between; font-size: 0.85em; color: #856404; margin-bottom: 5px; }
+        #sliderContainer10mo input[type="range"], #sliderContainer11_12 input[type="range"] { width: 100%; height: 10px; -webkit-appearance: none; background: #ffc107; border-radius: 5px; outline: none; }
+        #sliderContainer10mo input[type="range"]::-webkit-slider-thumb, #sliderContainer11_12 input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 30px; height: 30px; border-radius: 50%; background: #d39e00; cursor: pointer; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .valor-actual { text-align: center; font-size: 1.8em; font-weight: 800; color: #856404; margin-top: 8px; }
+        
+        .notificador-actual { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; padding: 16px; border-radius: 16px; border: 1px solid #e8edf2; }
+        .notificador-info { display: flex; align-items: center; gap: 14px; }
+        .notificador-info i { font-size: 42px; color: #667eea; }
+        .notificador-info strong { font-size: 1em; color: #1e293b; }
+        .notificador-info span { color: #64748b; font-size: 0.9em; }
+        .notificador-cargo { font-size: 0.8em; background: #e2e8f0; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-top: 5px; }
+        .btn-cambiar { background: #e2e8f0; border: none; padding: 10px 16px; border-radius: 12px; font-size: 0.9em; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        
+        .notificador-temporal { margin-top: 15px; }
+        .temp-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-verificar { flex: 1; padding: 14px; background: #10b981; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        .btn-cancelar { flex: 1; padding: 14px; background: #e2e8f0; color: #64748b; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        
+        .btn-submit { width: 100%; padding: 18px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; border: none; border-radius: 16px; font-size: 1.2em; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-top: 10px; }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); justify-content: center; align-items: flex-end; z-index: 1000; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 32px 32px 0 0; padding: 28px 22px; width: 100%; max-width: 500px; animation: slideUp 0.25s ease; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-content h2 { color: #1e3c72; margin-bottom: 20px; font-size: 1.4em; }
+        .confirm-resumen { margin-bottom: 20px; }
+        .confirm-section { margin-bottom: 18px; }
+        .confirm-section h3 { color: #64748b; font-size: 0.9em; margin-bottom: 10px; }
+        .confirm-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .confirm-tags span { background: #e2e8f0; padding: 6px 14px; border-radius: 20px; font-size: 0.85em; color: #1e293b; }
+        .confirm-actividad { padding: 10px 14px; border-radius: 12px; margin-bottom: 8px; }
+        .confirm-actividad.merito { background: #d1fae5; }
+        .confirm-actividad.demerito { background: #fee2e2; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .modal-buttons button { flex: 1; padding: 15px; border-radius: 14px; font-weight: 600; font-size: 1em; cursor: pointer; border: none; }
+        .modal-buttons .btn-cancelar { background: #e2e8f0; color: #64748b; }
+        .modal-buttons .btn-confirmar { background: #10b981; color: white; }
+        
+        .success-modal { text-align: center; }
+        .success-icon { font-size: 65px; color: #10b981; margin-bottom: 15px; }
+        .btn-success { width: 100%; padding: 16px; background: #1e3c72; color: white; border: none; border-radius: 14px; font-size: 1.1em; font-weight: 600; cursor: pointer; }
+        
+        @media (max-width: 480px) {
+            .header { padding: 14px 16px; }
+            .main-content { padding: 16px 12px; }
+            .form-section { padding: 18px 16px; }
+            .form-row { flex-direction: column; gap: 10px; }
+            .tipo-btn { padding: 12px; font-size: 0.95em; }
+            .btn-submit { padding: 16px; font-size: 1.1em; }
+            .modal-content { padding: 24px 18px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+            <h1 class="header-title">Notificar Actividad</h1>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <form id="notificarForm">
+            
+            <!-- DESTINATARIOS -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-users"></i> Destinatarios</h2>
+                <div class="destinatarios-list" id="destinatariosList">
+                    <p class="empty-destinatarios" id="emptyDestinatarios">No hay destinatarios agregados</p>
+                </div>
+                
+                <div class="search-box">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="buscarUsuario" placeholder="Buscar por CI, ID o nombre..." autocomplete="off">
+                    </div>
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+                
+                <button type="button" class="btn-qr-scanner" onclick="window.location.href='escaner.html?modo=destinatario'">
+                    <i class="fas fa-qrcode"></i> Escanear QR
+                </button>
+            </div>
+                    <!-- ACTIVIDADES -->
+        <div class="form-section">
+            <h2 class="section-title"><i class="fas fa-list-check"></i> Actividades</h2>
+            <div class="actividades-list" id="actividadesList"></div>
+            
+            <div class="actividad-buscador-container">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="buscarActividad" placeholder="Buscar merito o demerito..." autocomplete="off">
+                </div>
+                <div class="actividad-search-results" id="actividadSearchResults"></div>
+            </div>
+            
+            <div class="tipo-selector">
+                <button type="button" class="tipo-btn active" data-tipo="merito"><i class="fas fa-trophy"></i> Merito</button>
+                <button type="button" class="tipo-btn" data-tipo="demerito"><i class="fas fa-exclamation-triangle"></i> Demerito</button>
+            </div>
+            
+            <div class="form-group"><label>Categoria</label><select id="selectCategoria" class="form-control"><option value="">Todas</option></select></div>
+            <div class="form-group"><label>Actividad</label><select id="selectActividad" class="form-control"><option value="">Selecciona</option></select></div>
+            
+            <div class="form-group" id="cantidadContainer">
+                <label>Valor</label>
+                <input type="number" id="cantidad" class="form-control" min="1" value="1">
+            </div>
+            
+            <div id="sliderContainer10mo">
+                <label><i class="fas fa-sliders-h"></i> Rango demeritos - <b>10mo</b></label>
+                <div class="rango-info">
+                    <span id="sliderMin10mo">1</span>
+                    <span id="sliderGrado10mo">Estudiantes: -</span>
+                    <span id="sliderMax10mo">3</span>
+                </div>
+                <input type="range" id="sliderRango10mo" min="1" max="3" value="1">
+                <div class="valor-actual" id="sliderValor10mo">1</div>
+            </div>
+            
+            <div id="sliderContainer11_12">
+                <label><i class="fas fa-sliders-h"></i> Rango demeritos - <b>11no/12mo</b></label>
+                <div class="rango-info">
+                    <span id="sliderMin11_12">1</span>
+                    <span id="sliderGrado11_12">Estudiantes: -</span>
+                    <span id="sliderMax11_12">3</span>
+                </div>
+                <input type="range" id="sliderRango11_12" min="1" max="3" value="1">
+                <div class="valor-actual" id="sliderValor11_12">1</div>
+            </div>
+            
+            <button type="button" class="btn-add-actividad" id="btnAgregarActividad"><i class="fas fa-plus"></i> Agregar</button>
+        </div>
+
+        <!-- FECHA Y HORA -->
+        <div class="form-section">
+            <h2 class="section-title"><i class="fas fa-calendar-clock"></i> Fecha y Hora</h2>
+            <div class="form-row">
+                <div class="form-group"><label>Fecha</label><input type="date" name="fecha" id="fecha" class="form-control"></div>
+                <div class="form-group"><label>Hora</label><input type="time" name="hora" id="hora" class="form-control"></div>
+            </div>
+        </div>
+
+        <!-- QUIEN NOTIFICA -->
+        <div class="form-section">
+            <h2 class="section-title"><i class="fas fa-user-pen"></i> Quien Notifica</h2>
+            <div class="notificador-actual" id="notificadorActual">
+                <div class="notificador-info">
+                    <i class="fas fa-user-circle"></i>
+                    <div>
+                        <strong>Yo (Cuenta actual)</strong>
+                        <span id="notificadorNombre"></span>
+                        <span class="notificador-cargo" id="notificadorCargo"></span>
+                    </div>
+                </div>
+                <button type="button" class="btn-cambiar" id="btnCambiarNotificador"><i class="fas fa-exchange-alt"></i> Cambiar</button>
+            </div>
+            <div class="notificador-temporal" id="notificadorTemporal" style="display:none;">
+                <div class="form-group"><label>Nombre</label><input type="text" id="tempNombre" class="form-control" placeholder="Ej: Juan Perez"></div>
+                <div class="form-group"><label>Contrasena</label><input type="password" id="tempPassword" class="form-control" placeholder="Contrasena"></div>
+                <div class="temp-buttons">
+                    <button type="button" class="btn-verificar" id="btnVerificarTemp"><i class="fas fa-check"></i> Verificar</button>
+                    <button type="button" class="btn-cancelar" id="btnCancelarTemp"><i class="fas fa-times"></i> Cancelar</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- OBSERVACIONES -->
+        <div class="form-section">
+            <h2 class="section-title"><i class="fas fa-pencil"></i> Observaciones</h2>
+            <textarea name="observaciones" class="form-control" rows="3" placeholder="Notas adicionales..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnSubmit" disabled><i class="fas fa-paper-plane"></i> Notificar</button>
+    </form>
+</main>
+
+<!-- MODAL CONFIRMAR -->
+<div class="modal" id="confirmModal">
+    <div class="modal-content">
+        <h2><i class="fas fa-clipboard-list"></i> Confirmar</h2>
+        <div class="confirm-resumen" id="confirmResumen"></div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancelar" id="btnCancelarConfirm">Cancelar</button>
+            <button type="button" class="btn-confirmar" id="btnConfirmarEnvio">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EXITO -->
+<div class="modal" id="successModal">
+    <div class="modal-content success-modal">
+        <i class="fas fa-check-circle success-icon"></i>
+        <h2>Notificacion Exitosa!</h2>
+        <p>Las actividades han sido registradas.</p>
+        <button type="button" class="btn-success" onclick="window.location.href='dashboard.html'">Volver</button>
+    </div>
+</div>
+<script>
+    // ============================================
+    // CONFIGURACIÓN
+    // ============================================
+    const API_URL = 'https://tarjetadereporte.infinityfree.me/api/';
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    const token = localStorage.getItem('token') || '';
+    
+    // Redirigir si no hay sesión
+    if (!token) { window.location.href = 'login.html'; }
+    
+    // ============================================
+    // VARIABLES GLOBALES
+    // ============================================
+    let tipoActual = 'merito';
+    let actividadSeleccionada = null;
+    let actividadesAgregadas = [];
+    let destinatarios = [];
+    let catalogoMeritos = [];
+    let catalogoDemeritos = [];
+    let idStar = usuario.id || 0;
+    let tipoNotificador = 'cuenta';
+    let cargoNotificador = usuario.cargo || 'estudiante';
+    
+    // ============================================
+    // INICIALIZACIÓN
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fecha y hora actual
+        const now = new Date();
+        document.getElementById('fecha').value = now.toISOString().split('T')[0];
+        document.getElementById('hora').value = now.toTimeString().slice(0,5);
+        
+        // Mostrar datos del notificador
+        document.getElementById('notificadorNombre').textContent = (usuario.nombre || '') + ' ' + (usuario.apellidos || '');
+        document.getElementById('notificadorCargo').textContent = usuario.cargo || '';
+        
+        // Cargar catálogos desde API
+        cargarCatalogos();
+        
+        // Cargar destinatarios desde localStorage (si vienen del escáner)
+        cargarDestinatariosDesdeLocalStorage();
+        
+        // Cargar destinatario desde URL (si viene del dashboard)
+        cargarDestinatarioDesdeURL();
+        
+        // Eventos de sliders
+        document.getElementById('sliderRango10mo').oninput = function() {
+            document.getElementById('sliderValor10mo').textContent = this.value;
+            document.getElementById('cantidad').value = this.value;
+        };
+        document.getElementById('sliderRango11_12').oninput = function() {
+            document.getElementById('sliderValor11_12').textContent = this.value;
+            document.getElementById('cantidad').value = this.value;
+        };
+        
+        // Eventos de cuenta temporal
+        document.getElementById('btnCambiarNotificador').onclick = function() {
+            document.getElementById('notificadorActual').style.display = 'none';
+            document.getElementById('notificadorTemporal').style.display = 'block';
+        };
+        document.getElementById('btnCancelarTemp').onclick = function() {
+            document.getElementById('notificadorTemporal').style.display = 'none';
+            document.getElementById('notificadorActual').style.display = 'flex';
+            document.getElementById('tempNombre').value = '';
+            document.getElementById('tempPassword').value = '';
+            idStar = usuario.id || 0;
+            tipoNotificador = 'cuenta';
+            cargoNotificador = usuario.cargo || 'estudiante';
+        };
+        document.getElementById('btnVerificarTemp').onclick = verificarCuentaTemporal;
+        
+        // Buscador de estudiantes
+        iniciarBuscadorEstudiantes();
+        
+        // Buscador de actividades
+        iniciarBuscadorActividades();
+        
+        // Tipo de actividad (mérito/demérito)
+        document.querySelectorAll('.tipo-btn').forEach(function(btn) {
+            btn.onclick = function() {
+                document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                tipoActual = this.dataset.tipo;
+                
+                document.getElementById('sliderContainer10mo').style.display = 'none';
+                document.getElementById('sliderContainer11_12').style.display = 'none';
+                document.getElementById('cantidadContainer').style.display = 'block';
+                document.getElementById('cantidad').value = 1;
+                actividadSeleccionada = null;
+                
+                cargarCategorias();
+                document.getElementById('selectActividad').innerHTML = '<option value="">Selecciona</option>';
+                document.getElementById('buscarActividad').value = '';
+                document.getElementById('actividadSearchResults').style.display = 'none';
+            };
+        });
+        
+        // Categoría
+        document.getElementById('selectCategoria').onchange = function() {
+            cargarActividades(this.value);
+            document.getElementById('buscarActividad').value = '';
+            document.getElementById('actividadSearchResults').style.display = 'none';
+        };
+        
+        // Actividad seleccionada
+        document.getElementById('selectActividad').onchange = function() {
+            if (this.value) {
+                try {
+                    actividadSeleccionada = JSON.parse(this.value);
+                    if (tipoActual === 'merito') {
+                        document.getElementById('sliderContainer10mo').style.display = 'none';
+                        document.getElementById('sliderContainer11_12').style.display = 'none';
+                        document.getElementById('cantidadContainer').style.display = 'block';
+                        document.getElementById('cantidad').value = actividadSeleccionada.meritos || 1;
+                    } else {
+                        mostrarSlider(actividadSeleccionada);
+                    }
+                } catch (e) {}
+            }
+        };
+        
+        // Agregar actividad
+        document.getElementById('btnAgregarActividad').onclick = agregarActividad;
+        
+        // Enviar formulario
+        document.getElementById('notificarForm').onsubmit = function(e) {
+            e.preventDefault();
+            mostrarConfirmacion();
+        };
+        
+        // Inicializar
+        actualizarListaDestinatarios();
+        verificarFormulario();
+    });
+    // ============================================
+// FUNCIONES DE CATÁLOGOS
+// ============================================
+async function cargarCatalogos() {
+    try {
+        const [meritosRes, demeritosRes] = await Promise.all([
+            fetch(API_URL + 'catalogo.php?tipo=meritos&token=' + token),
+            fetch(API_URL + 'catalogo.php?tipo=demeritos&token=' + token)
+        ]);
+        catalogoMeritos = await meritosRes.json();
+        catalogoDemeritos = await demeritosRes.json();
+        cargarCategorias();
+        cargarActividades('');
+    } catch (e) {
+        console.error('Error cargando catálogos:', e);
+    }
+}
+
+function cargarCategorias() {
+    const catalogo = tipoActual === 'merito' ? catalogoMeritos : catalogoDemeritos;
+    const categorias = [...new Set(catalogo.map(i => i.categoria))];
+    const select = document.getElementById('selectCategoria');
+    select.innerHTML = '<option value="">Todas</option>';
+    categorias.sort().forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat; opt.textContent = cat;
+        select.appendChild(opt);
+    });
+}
+
+function cargarActividades(categoria) {
+    const catalogo = tipoActual === 'merito' ? catalogoMeritos : catalogoDemeritos;
+    const acts = categoria ? catalogo.filter(i => i.categoria === categoria) : catalogo;
+    const select = document.getElementById('selectActividad');
+    select.innerHTML = '<option value="">Selecciona</option>';
+    acts.forEach(act => {
+        const opt = document.createElement('option');
+        opt.value = JSON.stringify(act);
+        if (tipoActual === 'demerito') {
+            opt.textContent = act.falta + ' (10mo: ' + act.demeritos_10mo + ' | 11/12: ' + act.demeritos_11_12 + ')';
+        } else {
+            opt.textContent = act.causa + ' (' + act.meritos + ')';
+        }
+        select.appendChild(opt);
+    });
+}
+
+// ============================================
+// FUNCIONES DE DESTINATARIOS
+// ============================================
+function cargarDestinatariosDesdeLocalStorage() {
+    const data = localStorage.getItem('usuariosEscaneados');
+    if (data) {
+        try {
+            destinatarios = JSON.parse(data);
+            localStorage.removeItem('usuariosEscaneados');
+            actualizarListaDestinatarios();
+        } catch (e) {}
+    }
+}
+
+function cargarDestinatarioDesdeURL() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('destinatario');
+    if (id) {
+        fetch(API_URL + 'estudiante.php?id=' + id + '&token=' + token)
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.id) {
+                    agregarDestinatarioExistente(data);
+                }
+            })
+            .catch(() => {});
+    }
+}
+
+function agregarDestinatarioExistente(est) {
+    const existe = destinatarios.some(d => d.id === String(est.id));
+    if (existe) return;
+    destinatarios.push({
+        id: String(est.id),
+        nombre: est.nombre + ' ' + est.apellidos,
+        ci: est.ci || '',
+        grado: est.grado || '10mo'
+    });
+    actualizarListaDestinatarios();
+}
+
+function agregarDestinatario(id, nombre, ci, grado) {
+    const existe = destinatarios.some(d => d.id === String(id));
+    if (existe) { alert('Ya esta en la lista'); return; }
+    destinatarios.push({ id: String(id), nombre, ci, grado: grado || '10mo' });
+    actualizarListaDestinatarios();
+    document.getElementById('buscarUsuario').value = '';
+    document.getElementById('searchResults').classList.remove('show');
+}
+
+function eliminarDestinatario(index) {
+    destinatarios.splice(index, 1);
+    actualizarListaDestinatarios();
+    if (actividadSeleccionada && tipoActual === 'demerito') {
+        mostrarSlider(actividadSeleccionada);
+    }
+}
+
+function actualizarListaDestinatarios() {
+    const lista = document.getElementById('destinatariosList');
+    
+    if (destinatarios.length === 0) {
+        lista.innerHTML = '<p class="empty-destinatarios" id="emptyDestinatarios">No hay destinatarios agregados</p>';
+    } else {
+        lista.innerHTML = destinatarios.map((d, i) => 
+            '<div class="destinatario-tag"><span>' + d.nombre + ' (' + d.ci + ') - ' + d.grado + '</span><i class="fas fa-times-circle" onclick="eliminarDestinatario(' + i + ')"></i></div>'
+        ).join('');
+    }
+    verificarFormulario();
+}
+
+// ============================================
+// BUSCADOR DE ESTUDIANTES
+// ============================================
+function iniciarBuscadorEstudiantes() {
+    const input = document.getElementById('buscarUsuario');
+    const results = document.getElementById('searchResults');
+    let timeout;
+    
+    input.oninput = function() {
+        clearTimeout(timeout);
+        const query = this.value.trim();
+        if (query.length < 2) { results.classList.remove('show'); return; }
+        
+        results.innerHTML = '<p class="search-empty">Buscando...</p>';
+        results.classList.add('show');
+        
+        timeout = setTimeout(() => {
+            fetch(API_URL + 'buscar.php?q=' + encodeURIComponent(query) + '&token=' + token)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.length) {
+                        results.innerHTML = '<p class="search-empty">No se encontraron estudiantes</p>';
+                    } else {
+                        results.innerHTML = data.map(u =>
+                            '<div class="search-result-item" onclick="agregarDestinatario(\'' + u.id + '\',\'' + u.nombre + ' ' + u.apellidos + '\',\'' + u.ci + '\',\'' + (u.grado || '10mo') + '\')">' +
+                            '<div class="search-result-info"><span class="search-result-name">' + u.nombre + ' ' + u.apellidos + '</span><span class="search-result-details">CI: ' + u.ci + ' | Grado: ' + (u.grado || '10mo') + '</span></div>' +
+                            '<i class="fas fa-plus-circle" style="color:#10b981;font-size:1.3em;"></i></div>'
+                        ).join('');
+                    }
+                })
+                .catch(() => { results.innerHTML = '<p class="search-empty">Error de conexion</p>'; });
+        }, 300);
+    };
+    
+    document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !results.contains(e.target)) {
+            results.classList.remove('show');
+        }
+    });
+}
+
+// ============================================
+// SLIDER PARA DEMÉRITOS
+// ============================================
+function obtenerGruposPorGrado() {
+    const grupos = { '10mo': [], '11no': [] };
+    destinatarios.forEach(d => {
+        const g = d.grado || '10mo';
+        if (g === '10mo') grupos['10mo'].push(d.nombre);
+        else grupos['11no'].push(d.nombre + ' (' + g + ')');
+    });
+    return grupos;
+}
+
+function parsearRango(str) {
+    if (!str) return [1, 1];
+    const parts = str.toString().split('-');
+    return [parseInt(parts[0]) || 1, parseInt(parts[1]) || parseInt(parts[0]) || 1];
+}
+
+function mostrarSlider(act) {
+    const s10 = document.getElementById('sliderContainer10mo');
+    const s11 = document.getElementById('sliderContainer11_12');
+    const cant = document.getElementById('cantidadContainer');
+    
+    s10.style.display = 'none'; s11.style.display = 'none';
+    
+    if (tipoActual !== 'demerito') { cant.style.display = 'block'; return; }
+    
+    const grupos = obtenerGruposPorGrado();
+    const hay10 = grupos['10mo'].length > 0;
+    const hay11 = grupos['11no'].length > 0;
+    
+    if (!hay10 && !hay11) { cant.style.display = 'block'; return; }
+    cant.style.display = 'none';
+    
+    if (hay10 && act.demeritos_10mo) {
+        const [min, max] = parsearRango(act.demeritos_10mo);
+        document.getElementById('sliderRango10mo').min = min;
+        document.getElementById('sliderRango10mo').max = max;
+        document.getElementById('sliderRango10mo').value = min;
+        document.getElementById('sliderMin10mo').textContent = min;
+        document.getElementById('sliderMax10mo').textContent = max;
+        document.getElementById('sliderValor10mo').textContent = min;
+        document.getElementById('sliderGrado10mo').textContent = 'Estudiantes: ' + grupos['10mo'].join(', ');
+        s10.style.display = 'block';
+    }
+    
+    if (hay11 && act.demeritos_11_12) {
+        const [min, max] = parsearRango(act.demeritos_11_12);
+        document.getElementById('sliderRango11_12').min = min;
+        document.getElementById('sliderRango11_12').max = max;
+        document.getElementById('sliderRango11_12').value = min;
+        document.getElementById('sliderMin11_12').textContent = min;
+        document.getElementById('sliderMax11_12').textContent = max;
+        document.getElementById('sliderValor11_12').textContent = min;
+        document.getElementById('sliderGrado11_12').textContent = 'Estudiantes: ' + grupos['11no'].join(', ');
+        s11.style.display = 'block';
+    }
+    
+    document.getElementById('cantidad').value = hay10 ? document.getElementById('sliderRango10mo').value : document.getElementById('sliderRango11_12').value;
+}
+        // ============================================
+        // BUSCADOR DE ACTIVIDADES
+        // ============================================
+        function iniciarBuscadorActividades() {
+            const input = document.getElementById('buscarActividad');
+            const results = document.getElementById('actividadSearchResults');
+            
+            input.oninput = function() {
+                const query = this.value.trim().toLowerCase();
+                if (query.length < 1) { results.style.display = 'none'; return; }
+                
+                const catalogo = tipoActual === 'merito' ? catalogoMeritos : catalogoDemeritos;
+                const catFiltro = document.getElementById('selectCategoria').value || '';
+                
+                let filtrados = catalogo.filter(item => {
+                    const texto = tipoActual === 'merito' ? (item.causa + ' ' + item.categoria).toLowerCase() : (item.falta + ' ' + item.categoria).toLowerCase();
+                    return texto.includes(query) && (!catFiltro || item.categoria === catFiltro);
+                });
+                
+                if (!filtrados.length) {
+                    results.innerHTML = '<p class="search-empty">No se encontraron actividades</p>';
+                } else {
+                    results.innerHTML = filtrados.map(item => {
+                        const nombre = tipoActual === 'merito' ? item.causa : item.falta;
+                        const valor = tipoActual === 'merito' ? item.meritos : item.demeritos_10mo + ' / ' + item.demeritos_11_12;
+                        const bg = tipoActual === 'merito' ? '#d1fae5' : '#fee2e2';
+                        const tc = tipoActual === 'merito' ? '#065f46' : '#991b1b';
+                        const istr = JSON.stringify(item).replace(/"/g, '&quot;');
+                        return '<div class="actividad-search-item" onclick="seleccionarDesdeBusqueda(' + istr + ')">' +
+                            '<div class="actividad-search-info"><div class="actividad-search-nombre">' + nombre + '</div><div class="actividad-search-categoria">' + item.categoria + '</div></div>' +
+                            '<div class="actividad-search-valor" style="background:' + bg + ';color:' + tc + ';">' + (tipoActual === 'merito' ? '+' + valor : valor) + '</div></div>';
+                    }).join('');
+                }
+                results.style.display = 'block';
+            };
+        }
+        
+        window.seleccionarDesdeBusqueda = function(itemData) {
+            actividadSeleccionada = itemData;
+            if (itemData.categoria) {
+                document.getElementById('selectCategoria').value = itemData.categoria;
+                cargarActividades(itemData.categoria);
+            }
+            setTimeout(() => { document.getElementById('selectActividad').value = JSON.stringify(itemData); }, 50);
+            
+            if (tipoActual === 'merito') {
+                document.getElementById('sliderContainer10mo').style.display = 'none';
+                document.getElementById('sliderContainer11_12').style.display = 'none';
+                document.getElementById('cantidadContainer').style.display = 'block';
+                document.getElementById('cantidad').value = itemData.meritos || 1;
+            } else {
+                mostrarSlider(itemData);
+            }
+            document.getElementById('actividadSearchResults').style.display = 'none';
+            document.getElementById('buscarActividad').value = '';
+        };
+        
+        // ============================================
+        // AGREGAR ACTIVIDAD
+        // ============================================
+        function agregarActividad() {
+            if (!actividadSeleccionada) {
+                const val = document.getElementById('selectActividad').value;
+                if (val) { try { actividadSeleccionada = JSON.parse(val); } catch (e) {} }
+            }
+            if (!actividadSeleccionada) { alert('Selecciona una actividad'); return; }
+            
+            const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+            let v10 = null, v11 = null;
+            
+            if (tipoActual === 'demerito') {
+                if (document.getElementById('sliderContainer10mo').style.display === 'block') {
+                    v10 = parseInt(document.getElementById('sliderRango10mo').value);
+                }
+                if (document.getElementById('sliderContainer11_12').style.display === 'block') {
+                    v11 = parseInt(document.getElementById('sliderRango11_12').value);
+                }
+            }
+            
+            actividadesAgregadas.push({
+                tipo: tipoActual,
+                categoria: document.getElementById('selectCategoria').value || actividadSeleccionada.categoria,
+                actividad_id: actividadSeleccionada.id,
+                nombre: tipoActual === 'merito' ? actividadSeleccionada.causa : actividadSeleccionada.falta,
+                cantidad, valor10mo: v10, valor11_12: v11
+            });
+            
+            renderActividades();
+            verificarFormulario();
+            actividadSeleccionada = null;
+            document.getElementById('selectActividad').value = '';
+            document.getElementById('cantidad').value = 1;
+            document.getElementById('sliderContainer10mo').style.display = 'none';
+            document.getElementById('sliderContainer11_12').style.display = 'none';
+            document.getElementById('cantidadContainer').style.display = 'block';
+        }
+        
+        function eliminarActividad(index) {
+            actividadesAgregadas.splice(index, 1);
+            renderActividades();
+            verificarFormulario();
+        }
+        
+        function renderActividades() {
+            const lista = document.getElementById('actividadesList');
+            if (!actividadesAgregadas.length) {
+                lista.innerHTML = '<p class="empty-actividades">No hay actividades agregadas</p>';
+                return;
+            }
+            
+            const grupos = obtenerGruposPorGrado();
+            const hayAmbos = grupos['10mo'].length > 0 && grupos['11no'].length > 0;
+            
+            lista.innerHTML = actividadesAgregadas.map((act, i) => {
+                const bg = act.tipo === 'merito' ? '#d1fae5' : '#fee2e2';
+                const border = act.tipo === 'merito' ? '#10b981' : '#ef4444';
+                const color = act.tipo === 'merito' ? '#065f46' : '#991b1b';
+                
+                let valorHTML = '';
+                if (act.tipo === 'merito') {
+                    valorHTML = '<span style="color:' + color + ';font-weight:700;font-size:1.1em;">+' + act.cantidad + '</span>';
+                } else if (hayAmbos && act.valor10mo !== null && act.valor11_12 !== null) {
+                    valorHTML = '<div class="actividad-tag-valores"><span style="color:#b45309;font-weight:600;">10mo: -' + act.valor10mo + '</span><span style="color:#b45309;font-weight:600;">11/12: -' + act.valor11_12 + '</span></div>';
+                } else {
+                    valorHTML = '<span style="color:' + color + ';font-weight:700;font-size:1.1em;">-' + act.cantidad + '</span>';
+                }
+                
+                return '<div class="actividad-tag" style="background:' + bg + ';border-left:4px solid ' + border + ';">' +
+                    '<div><div class="actividad-tag-nombre">' + act.nombre + '</div><div class="actividad-tag-categoria">' + act.categoria + '</div></div>' +
+                    '<div class="actividad-tag-actions">' + valorHTML + '<i class="fas fa-trash-alt" onclick="eliminarActividad(' + i + ')"></i></div></div>';
+            }).join('');
+        }
+        
+        function verificarFormulario() {
+            document.getElementById('btnSubmit').disabled = !(destinatarios.length > 0 && actividadesAgregadas.length > 0);
+        }
+        
+        // ============================================
+        // CUENTA TEMPORAL
+        // ============================================
+        async function verificarCuentaTemporal() {
+            const nombre = document.getElementById('tempNombre').value.trim();
+            const password = document.getElementById('tempPassword').value;
+            if (!nombre || !password) { alert('Completa todos los campos'); return; }
+            
+            try {
+                const res = await fetch(API_URL + 'verificar_notificador.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, password, token })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    idStar = data.id;
+                    tipoNotificador = 'temporal';
+                    cargoNotificador = data.cargo;
+                    
+                    document.getElementById('notificadorTemporal').style.display = 'none';
+                    document.getElementById('notificadorActual').style.display = 'flex';
+                    document.querySelector('#notificadorActual .notificador-info span').textContent = nombre;
+                    document.querySelector('#notificadorActual .notificador-cargo').textContent = data.cargo || 'Temporal';
+                    document.querySelector('#notificadorActual strong').textContent = 'Cuenta Temporal';
+                    document.getElementById('tempNombre').value = '';
+                    document.getElementById('tempPassword').value = '';
+                    alert('Cuenta temporal verificada correctamente');
+                } else {
+                    alert('Credenciales incorrectas');
+                }
+            } catch (e) {
+                alert('Error de conexion');
+            }
+        }
+        
+        // ============================================
+        // CONFIRMAR Y ENVIAR
+        // ============================================
+        function mostrarConfirmacion() {
+            const modal = document.getElementById('confirmModal');
+            const resumen = document.getElementById('confirmResumen');
+            const fecha = document.getElementById('fecha').value;
+            const hora = document.getElementById('hora').value;
+            const obs = document.querySelector('textarea[name="observaciones"]').value || 'Ninguna';
+            const nn = document.querySelector('#notificadorActual .notificador-info span').textContent;
+            const nc = document.querySelector('#notificadorActual .notificador-cargo').textContent;
+            
+            const grupos = obtenerGruposPorGrado();
+            const hayAmbos = grupos['10mo'].length > 0 && grupos['11no'].length > 0;
+            
+            let h = '<div class="confirm-section"><h3>Destinatarios (' + destinatarios.length + ')</h3><div class="confirm-tags">';
+            destinatarios.forEach(d => { h += '<span>' + d.nombre + ' (' + d.grado + ')</span>'; });
+            h += '</div></div>';
+            
+            h += '<div class="confirm-section"><h3>Actividades (' + actividadesAgregadas.length + ')</h3>';
+            actividadesAgregadas.forEach(a => {
+                let vt = a.tipo === 'merito' ? '+' + a.cantidad : (hayAmbos && a.valor10mo ? '10mo: -' + a.valor10mo + ' | 11/12: -' + a.valor11_12 : '-' + a.cantidad);
+                h += '<div class="confirm-actividad ' + a.tipo + '"><strong>' + a.nombre + '</strong><br><small>' + a.categoria + ' | ' + vt + '</small></div>';
+            });
+            h += '</div>';
+            h += '<div class="confirm-section"><h3>Fecha y Hora</h3><p>' + fecha + ' | ' + hora + '</p></div>';
+            h += '<div class="confirm-section"><h3>Notificado por</h3><p>' + nn + ' (' + nc + ')</p></div>';
+            h += '<div class="confirm-section"><h3>Observaciones</h3><p>' + obs + '</p></div>';
+            
+            resumen.innerHTML = h;
+            modal.classList.add('show');
+            
+            document.getElementById('btnCancelarConfirm').onclick = () => modal.classList.remove('show');
+            document.getElementById('btnConfirmarEnvio').onclick = enviarNotificacion;
+            modal.onclick = e => { if (e.target === modal) modal.classList.remove('show'); };
+        }
+        
+        async function enviarNotificacion() {
+            document.getElementById('confirmModal').classList.remove('show');
+            
+            const data = {
+                token,
+                destinatarios,
+                actividades: actividadesAgregadas,
+                fecha: document.getElementById('fecha').value,
+                hora: document.getElementById('hora').value,
+                observaciones: document.querySelector('textarea[name="observaciones"]').value || '',
+                id_star: idStar,
+                tipo_notificador: tipoNotificador,
+                cargo_notificador: cargoNotificador
+            };
+            
+            try {
+                const res = await fetch(API_URL + 'notificar.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    document.getElementById('successModal').classList.add('show');
+                    actividadesAgregadas = [];
+                    destinatarios = [];
+                    renderActividades();
+                    actualizarListaDestinatarios();
+                    verificarFormulario();
+                    
+                    if (tipoNotificador === 'temporal') {
+                        idStar = usuario.id || 0;
+                        tipoNotificador = 'cuenta';
+                        cargoNotificador = usuario.cargo || 'estudiante';
+                        document.getElementById('notificadorNombre').textContent = (usuario.nombre || '') + ' ' + (usuario.apellidos || '');
+                        document.getElementById('notificadorCargo').textContent = usuario.cargo || '';
+                        document.querySelector('#notificadorActual strong').textContent = 'Yo (Cuenta actual)';
+                    }
+                } else {
+                    alert('Error: ' + (result.message || 'No se pudo procesar'));
+                }
+            } catch (e) {
+                alert('Error de conexion');
+            }
+        }
+        
+        // Exponer funciones globales
+        window.agregarDestinatario = agregarDestinatario;
+        window.eliminarDestinatario = eliminarDestinatario;
+        window.eliminarActividad = eliminarActividad;
+    </script>
+</body>
+</html>
